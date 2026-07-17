@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOMAD X1 — Магазин термосов</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0e14;
+            color: #e8edf5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        /* ===== APP CONTAINER ===== */
+        #app {
+            max-width: 480px;
+            width: 100%;
+            background: #141a24;
+            border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+            position: relative;
+            min-height: 640px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            padding: 18px 20px 12px;
+            background: linear-gradient(135deg, #1a2332, #0f1622);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: linear-gradient(90deg, #f0c060, #e8a040);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-header .cart-badge {
+            background: #2a3344;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #f0c060;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(240, 192, 96, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-header .cart-badge:hover {
+            background: #334058;
+        }
+
+        .app-header .cart-badge .count {
+            background: #f0c060;
+            color: #0a0e14;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* ===== SCROLLABLE CONTENT ===== */
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px 20px;
+            scroll-behavior: smooth;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scroll-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: #3a4a5e;
+            border-radius: 10px;
+        }
+
+        /* ===== MESSAGES ===== */
+        .message {
+            animation: fadeSlide 0.25s ease-out;
+            margin-bottom: 16px;
+        }
+
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-bubble {
+            background: #1e2838;
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .message-bubble.bot {
+            border-left: 3px solid #f0c060;
+        }
+
+        .message-bubble .text {
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message-bubble .text strong {
+            color: #f0c060;
+        }
+
+        .message-bubble .text em {
+            color: #a0b8d0;
+            font-style: italic;
+        }
+
+        /* ===== PRODUCT IMAGE ===== */
+        .product-image {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 8px 0 12px;
+            background: #0f1622;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ===== INLINE KEYBOARD (BUTTONS) ===== */
+        .inline-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .inline-keyboard .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .inline-keyboard .row .btn {
+            flex: 1 0 auto;
+            min-width: 60px;
+            padding: 10px 14px;
+            background: #253040;
+            border: none;
+            border-radius: 12px;
+            color: #e8edf5;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            line-height: 1.3;
+        }
+
+        .inline-keyboard .row .btn:hover {
+            background: #2f3d54;
+            transform: scale(0.98);
+        }
+
+        .inline-keyboard .row .btn:active {
+            transform: scale(0.95);
+        }
+
+        .inline-keyboard .row .btn.primary {
+            background: #f0c060;
+            color: #0a0e14;
+            font-weight: 600;
+            border-color: #f0c060;
+        }
+
+        .inline-keyboard .row .btn.primary:hover {
+            background: #e8b04a;
+        }
+
+        .inline-keyboard .row .btn.danger {
+            background: #6a2a2a;
+            color: #f0a0a0;
+            border-color: #7a3a3a;
+        }
+
+        .inline-keyboard .row .btn.danger:hover {
+            background: #7a3a3a;
+        }
+
+        .inline-keyboard .row .btn.back {
+            background: #1a2332;
+            color: #8899b0;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .inline-keyboard .row .btn.back:hover {
+            background: #253040;
+            color: #c0d0e0;
+        }
+
+        .inline-keyboard .row .btn.small {
+            flex: 0 1 auto;
+            min-width: 40px;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        /* ===== CHECKOUT FORM ===== */
+        .checkout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .checkout-form input {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #2a3a4a;
+            background: #0f1622;
+            color: #e8edf5;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .checkout-form input:focus {
+            border-color: #f0c060;
+            box-shadow: 0 0 0 3px rgba(240, 192, 96, 0.15);
+        }
+
+        .checkout-form input::placeholder {
+            color: #5a6a7a;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 500px) {
+            #app {
+                border-radius: 16px;
+                max-height: 95vh;
+            }
+            .app-header h1 {
+                font-size: 16px;
+            }
+            .message-bubble {
+                padding: 12px 14px;
+            }
+            .message-bubble .text {
+                font-size: 14px;
+            }
+            .inline-keyboard .row .btn {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+        }
+
+        /* ===== SCROLLBAR STYLING ===== */
+        .scroll-area {
+            scrollbar-width: thin;
+            scrollbar-color: #3a4a5e transparent;
+        }
+
+        /* ===== UTILITY ===== */
+        .mt-1 { margin-top: 4px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .gap-1 { gap: 4px; }
+        .gap-2 { gap: 8px; }
+
+        .text-muted {
+            color: #7a8a9a;
+            font-size: 13px;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-gold {
+            color: #f0c060;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- HEADER -->
+    <div class="app-header">
+        <h1>🧊 NOMAD X1</h1>
+        <div class="cart-badge" id="cartBadge" onclick="viewCart()">
+            🛒 <span id="cartCount">0</span>
+        </div>
+    </div>
+
+    <!-- SCROLLABLE CONTENT -->
+    <div class="scroll-area" id="scrollArea">
+        <div id="messagesContainer">
+            <!-- Сообщения будут рендериться здесь -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    //  ДАННЫЕ (полный аналог Python-словарей)
+    // =========================================================================
+
+    // Базовый путь к папке с изображениями
+    const IMAGES_BASE = 'images/';
+
+    const BASIC_PRODUCTS = {
+        hydrocore: {
+            name: "HydroCore — Термос для жидкостей",
+            price: 9490,
+            desc: "🧊 *HydroCore — Термос для жидкостей*\nЦена: 9 490 ₽\n\nХарактеристики:\n• Объём 400 мл\n• Термохромное кольцо-индикатор\n• Встроенная капсула в крышке\n• Герметичная кнопка-фиксатор\n• Покрытие CeramicTech\n• Вес: 280 г",
+            image: IMAGES_BASE + 'basic/hydrocore.jpg'
+        },
+        gastrobase: {
+            name: "GastroBase — Термо-отсек для еды",
+            price: 7290,
+            desc: "🍲 *GastroBase — Термо-отсек для еды*\nЦена: 7 290 ₽\n\nХарактеристики:\n• Объём 600 мл\n• Съёмная магнитная перегородка\n• Крышка-трансформер\n• Широкая резьба\n• Керамическое покрытие\n• Вес: 380 г",
+            image: IMAGES_BASE + 'basic/gastrobase.jpg'
+        },
+        utensilpod: {
+            name: "UtensilPod — Тубус для приборов",
+            price: 3890,
+            desc: "🍴 *UtensilPod — Тубус для приборов*\nЦена: 3 890 ₽\n\nХарактеристики:\n• Магнитное крепление\n• Складная ложка-вилка\n• Герметичный корпус\n• Вес: 120 г",
+            image: IMAGES_BASE + 'basic/utensilpod.jpg'
+        }
+    };
+
+    const ADVANCED_PRODUCTS = {
+        utensilpod_pro: {
+            name: "UtensilPod PRO",
+            price: 5690,
+            desc: "⚡ *UtensilPod PRO*\nЦена: 5 690 ₽\n\nУвеличенный набор приборов с ножом.",
+            image: IMAGES_BASE + 'advanced/utensilpod_pro.jpg'
+        },
+        divider_plus: {
+            name: "GastroBase DIVIDER+",
+            price: 1290,
+            desc: "⚡ *GastroBase DIVIDER+*\nЦена: 1 290 ₽\n\nНабор перегородок.",
+            image: IMAGES_BASE + 'advanced/divider_plus.jpg'
+        },
+        capsule_set: {
+            name: "HydroCore CAPSULE SET",
+            price: 1490,
+            desc: "⚡ *HydroCore CAPSULE SET*\nЦена: 1 490 ₽\n\n4 цветные капсулы.",
+            image: IMAGES_BASE + 'advanced/capsule_set.jpg'
+        }
+    };
+
+    const CUSTOM_MATERIALS = {
+        matte_forest: { 
+            name: "Matte Forest", 
+            price: 1900, 
+            image: IMAGES_BASE + 'materials/matte_forest.jpg' 
+        },
+        desert_sand: { 
+            name: "Desert Sand", 
+            price: 1900, 
+            image: IMAGES_BASE + 'materials/desert_sand.jpg' 
+        },
+        carbon_fiber: { 
+            name: "Carbon Fiber", 
+            price: 2900, 
+            image: IMAGES_BASE + 'materials/carbon_fiber.jpg' 
+        },
+        leather_grip: { 
+            name: "Leather Grip", 
+            price: 1900, 
+            image: IMAGES_BASE + 'materials/leather_grip.jpg' 
+        }
+    };
+
+    const CUSTOM_OTHER = {
+        color_ring_swap: {
+            name: "Color Ring Swap",
+            price: 990,
+            desc: "🎨 *Color Ring Swap*\nЦена: 990 ₽\n\nНабор сменных колец.",
+            image: IMAGES_BASE + 'custom/color_ring_swap.jpg'
+        },
+        laser_engraving: {
+            name: "Laser Engraving",
+            price: 590,
+            desc: "🎨 *Laser Engraving*\nЦена: 590 ₽\n\nГравировка.",
+            image: IMAGES_BASE + 'custom/laser_engraving.jpg'
+        },
+        carabiner_link: {
+            name: "Carabiner Link",
+            price: 890,
+            desc: "🎨 *Carabiner Link*\nЦена: 890 ₽\n\nАлюминиевый карабин.",
+            image: IMAGES_BASE + 'custom/carabiner_link.jpg'
+        }
+    };
+
+    const BUNDLES = {
+        nomad_pro: {
+            name: "NOMAD X1 Pro Bundle",
+            price: 18990,
+            desc: "📦 *NOMAD X1 Pro Bundle*\nЦена: 18 990 ₽\n\nПолный набор.",
+            image: IMAGES_BASE + 'bundles/nomad_pro.jpg'
+        },
+        nomad_traveler: {
+            name: "NOMAD X1 Traveler Edition",
+            price: 16490,
+            desc: "📦 *NOMAD X1 Traveler Edition*\nЦена: 16 490 ₽\n\nНабор для путешествий.",
+            image: IMAGES_BASE + 'bundles/nomad_traveler.jpg'
+        },
+        nomad_tech: {
+            name: "NOMAD X1 Tech Edition",
+            price: 18490,
+            desc: "📦 *NOMAD X1 Tech Edition*\nЦена: 18 490 ₽\n\nТехнологичный набор.",
+            image: IMAGES_BASE + 'bundles/nomad_tech.jpg'
+        }
+    };
+
+    const ALL_SIMPLE_PRODUCTS = { ...BASIC_PRODUCTS, ...ADVANCED_PRODUCTS, ...CUSTOM_OTHER, ...BUNDLES };
+    const GENERAL_SPECS = "ℹ️ *Общие характеристики системы NOMAD X1*\n\n• Материал: нержавеющая сталь 304";
+
+    // =========================================================================
+    //  СОСТОЯНИЕ
+    // =========================================================================
+
+    let cart = {};                // { key: { name, price, qty } }
+    let orderCounter = 0;
+    let orders = {};
+
+    // Состояние для оформления заказа (пошагово)
+    let checkoutState = null;    // null | { step: 'name'|'phone', name: string }
+
+    // =========================================================================
+    //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // =========================================================================
+
+    function cartTotal() {
+        let total = 0;
+        for (const key in cart) {
+            total += cart[key].price * cart[key].qty;
+        }
+        return total;
+    }
+
+    function cartItemsCount() {
+        let count = 0;
+        for (const key in cart) {
+            count += cart[key].qty;
+        }
+        return count;
+    }
+
+    function formatCartText() {
+        if (Object.keys(cart).length === 0) return "🛒 Ваша корзина пуста.";
+        const lines = ["🛒 *Ваша корзина:*\n"];
+        for (const key in cart) {
+            const item = cart[key];
+            const subtotal = item.price * item.qty;
+            lines.push(`• ${item.name} — ${item.price} ₽ × ${item.qty} = ${subtotal} ₽`);
+        }
+        lines.push(`\n💰 *Итого: ${cartTotal()} ₽*`);
+        return lines.join("\n");
+    }
+
+    function getProductImage(category, key) {
+        // Получение пути к изображению из данных
+        if (category === 'basic' && BASIC_PRODUCTS[key]) return BASIC_PRODUCTS[key].image;
+        if (category === 'advanced' && ADVANCED_PRODUCTS[key]) return ADVANCED_PRODUCTS[key].image;
+        if (category === 'custom' && CUSTOM_OTHER[key]) return CUSTOM_OTHER[key].image;
+        if (category === 'bundles' && BUNDLES[key]) return BUNDLES[key].image;
+        if (category === 'materials' && CUSTOM_MATERIALS[key]) return CUSTOM_MATERIALS[key].image;
+        return null;
+    }
+
+    function getProductDesc(category, key) {
+        if (category === 'basic' && BASIC_PRODUCTS[key]) {
+            return BASIC_PRODUCTS[key].desc + "\n\n" + GENERAL_SPECS;
+        }
+        if (category === 'advanced' && ADVANCED_PRODUCTS[key]) return ADVANCED_PRODUCTS[key].desc;
+        if (category === 'custom' && CUSTOM_OTHER[key]) return CUSTOM_OTHER[key].desc;
+        if (category === 'bundles' && BUNDLES[key]) return BUNDLES[key].desc;
+        if (category === 'materials' && CUSTOM_MATERIALS[key]) {
+            const m = CUSTOM_MATERIALS[key];
+            return `🖌 *${m.name}*\nЦена: +${m.price} ₽`;
+        }
+        return "Товар не найден";
+    }
+
+    function getProductName(key) {
+        if (ALL_SIMPLE_PRODUCTS[key]) return ALL_SIMPLE_PRODUCTS[key].name;
+        if (CUSTOM_MATERIALS[key]) return CUSTOM_MATERIALS[key].name;
+        return key;
+    }
+
+    function getProductPrice(key) {
+        if (ALL_SIMPLE_PRODUCTS[key]) return ALL_SIMPLE_PRODUCTS[key].price;
+        if (CUSTOM_MATERIALS[key]) return CUSTOM_MATERIALS[key].price;
+        return 0;
+    }
+
+    function getProductByKey(key) {
+        if (ALL_SIMPLE_PRODUCTS[key]) return ALL_SIMPLE_PRODUCTS[key];
+        if (CUSTOM_MATERIALS[key]) return CUSTOM_MATERIALS[key];
+        return null;
+    }
+
+    function addToCart(key, name, price, qty = 1) {
+        if (cart[key]) {
+            cart[key].qty += qty;
+        } else {
+            cart[key] = { name, price, qty };
+        }
+        updateCartBadge();
+    }
+
+    function removeFromCart(key) {
+        delete cart[key];
+        updateCartBadge();
+    }
+
+    function clearCart() {
+        cart = {};
+        updateCartBadge();
+    }
+
+    function updateCartBadge() {
+        const count = cartItemsCount();
+        document.getElementById('cartCount').textContent = count;
+    }
+
+    // =========================================================================
+    //  РЕНДЕРИНГ СООБЩЕНИЙ (UI)
+    // =========================================================================
+
+    const container = document.getElementById('messagesContainer');
+    const scrollArea = document.getElementById('scrollArea');
+
+    function renderMessage(text, keyboard = null, image = null) {
+        let html = `<div class="message"><div class="message-bubble bot">`;
+
+        // Изображение
+        if (image) {
+            html += `<img class="product-image" src="${image}" alt="Product" loading="lazy" onerror="this.style.display='none'">`;
+        }
+
+        // Текст (поддержка Markdown-подобного форматирования)
+        let formattedText = escapeHtml(text);
+        formattedText = formattedText.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        html += `<div class="text">${formattedText}</div>`;
+
+        // Клавиатура
+        if (keyboard && keyboard.length > 0) {
+            html += `<div class="inline-keyboard">`;
+            for (const row of keyboard) {
+                html += `<div class="row">`;
+                for (const btn of row) {
+                    const classes = ['btn'];
+                    if (btn.type === 'primary') classes.push('primary');
+                    if (btn.type === 'danger') classes.push('danger');
+                    if (btn.type === 'back') classes.push('back');
+                    if (btn.type === 'small') classes.push('small');
+                    const onclick = `handleButton('${btn.data}', '${btn.type || ''}')`;
+                    html += `<button class="${classes.join(' ')}" onclick="${onclick}">${btn.label}</button>`;
+                }
+                html += `</div>`;
+            }
+            html += `</div>`;
+        }
+
+        html += `</div></div>`;
+        container.innerHTML += html;
+
+        // Прокрутка вниз
+        scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function clearMessages() {
+        container.innerHTML = '';
+        // Сбрасываем состояние оформления заказа при переходе
+        checkoutState = null;
+    }
+
+    // =========================================================================
+    //  КЛАВИАТУРЫ (аналоги inline-кнопок)
+    // =========================================================================
+
+    function mainMenuKeyboard() {
+        const count = cartItemsCount();
+        const cartLabel = count > 0 ? `🛒 Корзина (${count})` : '🛒 Корзина (пусто)';
+        return [
+            [{ label: '🧩 Основные модули', data: 'cat:basic' }],
+            [{ label: '⚡ Продвинутые модули', data: 'cat:advanced' }],
+            [{ label: '🎨 Кастомизация', data: 'cat:custom' }],
+            [{ label: '📦 Специальные наборы', data: 'cat:bundles' }],
+            [{ label: cartLabel, data: 'cart:view' }],
+            [{ label: '📞 Помощь и контакты', data: 'cat:help' }]
+        ];
+    }
+
+    function basicCategoryKeyboard() {
+        const rows = [];
+        for (const key in BASIC_PRODUCTS) {
+            const p = BASIC_PRODUCTS[key];
+            rows.push([{ label: `${p.name} — ${p.price} ₽`, data: `prod:basic:${key}` }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]);
+        return rows;
+    }
+
+    function advancedCategoryKeyboard() {
+        const rows = [];
+        for (const key in ADVANCED_PRODUCTS) {
+            const p = ADVANCED_PRODUCTS[key];
+            rows.push([{ label: `${p.name} — ${p.price} ₽`, data: `prod:advanced:${key}` }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]);
+        return rows;
+    }
+
+    function customCategoryKeyboard() {
+        const rows = [
+            [{ label: '🖌 Сменные материалы', data: 'custmat:menu' }]
+        ];
+        for (const key in CUSTOM_OTHER) {
+            const p = CUSTOM_OTHER[key];
+            rows.push([{ label: `${p.name} — ${p.price} ₽`, data: `prod:custom:${key}` }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]);
+        return rows;
+    }
+
+    function customMaterialsKeyboard() {
+        const rows = [];
+        for (const key in CUSTOM_MATERIALS) {
+            const m = CUSTOM_MATERIALS[key];
+            rows.push([{ label: `${m.name} — +${m.price} ₽`, data: `custmat:pick:${key}` }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'cat:custom', type: 'back' }]);
+        return rows;
+    }
+
+    function bundlesCategoryKeyboard() {
+        const rows = [];
+        for (const key in BUNDLES) {
+            const p = BUNDLES[key];
+            rows.push([{ label: `${p.name} — ${p.price} ₽`, data: `prod:bundles:${key}` }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]);
+        return rows;
+    }
+
+    function productCardKeyboard(category, key) {
+        const backMap = { basic: 'cat:basic', advanced: 'cat:advanced', custom: 'cat:custom', bundles: 'cat:bundles' };
+        return [
+            [{ label: '🛒 Добавить в корзину', data: `add:${key}`, type: 'primary' }],
+            [{ label: '⬅️ Назад', data: backMap[category] || 'back:main', type: 'back' }]
+        ];
+    }
+
+    function materialCardKeyboard(materialKey) {
+        return [
+            [{ label: '🛒 Добавить в корзину', data: `custmat:add:${materialKey}`, type: 'primary' }],
+            [{ label: '⬅️ Назад', data: 'custmat:menu', type: 'back' }]
+        ];
+    }
+
+    function cartKeyboard() {
+        const rows = [];
+        for (const key in cart) {
+            const item = cart[key];
+            rows.push([{ label: `${item.name} × ${item.qty}`, data: 'noop', type: 'small' }]);
+            rows.push([
+                { label: '➖', data: `cart:dec:${key}`, type: 'small' },
+                { label: '➕', data: `cart:inc:${key}`, type: 'small' },
+                { label: '❌ Удалить', data: `cart:del:${key}`, type: 'danger' }
+            ]);
+        }
+        if (Object.keys(cart).length > 0) {
+            rows.push([{ label: '🧹 Очистить корзину', data: 'cart:clear', type: 'danger' }]);
+            rows.push([{ label: '✅ Оформить заказ', data: 'cart:checkout', type: 'primary' }]);
+        }
+        rows.push([{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]);
+        return rows;
+    }
+
+    // =========================================================================
+    //  ОБРАБОТЧИК КНОПОК
+    // =========================================================================
+
+    function handleButton(data, type) {
+        // Если мы в процессе оформления заказа — блокируем навигацию
+        if (checkoutState && data !== 'back:main') {
+            return;
+        }
+
+        // Сброс состояния оформления при навигации
+        if (data === 'back:main') {
+            checkoutState = null;
+        }
+
+        console.log('Button clicked:', data);
+        processAction(data);
+    }
+
+    function processAction(data) {
+        if (data === 'noop') return;
+
+        // === Навигация ===
+        if (data === 'back:main') {
+            clearMessages();
+            renderMessage(WELCOME_TEXT, mainMenuKeyboard());
+            return;
+        }
+
+        if (data === 'cat:basic') {
+            clearMessages();
+            renderMessage('🧩 *Основные модули*\nВыберите товар:', basicCategoryKeyboard());
+            return;
+        }
+
+        if (data === 'cat:advanced') {
+            clearMessages();
+            renderMessage('⚡ *Продвинутые модули*\nВыберите товар:', advancedCategoryKeyboard());
+            return;
+        }
+
+        if (data === 'cat:custom') {
+            clearMessages();
+            renderMessage('🎨 *Коллекция кастомизации*\nВыберите:', customCategoryKeyboard());
+            return;
+        }
+
+        if (data === 'cat:bundles') {
+            clearMessages();
+            renderMessage('📦 *Специальные наборы*\nВыберите:', bundlesCategoryKeyboard());
+            return;
+        }
+
+        if (data === 'cat:help') {
+            clearMessages();
+            renderMessage(HELP_TEXT, [[{ label: '⬅️ Назад', data: 'back:main', type: 'back' }]]);
+            return;
+        }
+
+        // === Кастомные материалы ===
+        if (data === 'custmat:menu') {
+            clearMessages();
+            renderMessage('🖌 *Сменные материалы*\nВыберите вариант:', customMaterialsKeyboard());
+            return;
+        }
+
+        if (data.startsWith('custmat:pick:')) {
+            const matKey = data.split(':')[2];
+            const mat = CUSTOM_MATERIALS[matKey];
+            if (!mat) return;
+            clearMessages();
+            const img = getProductImage('materials', matKey);
+            renderMessage(`🖌 *${mat.name}*\nЦена: +${mat.price} ₽`, materialCardKeyboard(matKey), img);
+            return;
+        }
+
+        if (data.startsWith('custmat:add:')) {
+            const matKey = data.split(':')[2];
+            const mat = CUSTOM_MATERIALS[matKey];
+            if (!mat) return;
+            const cartKey = `material_${matKey}`;
+            addToCart(cartKey, mat.name, mat.price);
+            clearMessages();
+            renderMessage(`✅ *${mat.name}* добавлен!\nСумма: ${cartTotal()} ₽`, mainMenuKeyboard());
+            return;
+        }
+
+        // === Товары ===
+        if (data.startsWith('prod:')) {
+            const parts = data.split(':');
+            const category = parts[1];
+            const key = parts[2];
+            const prod = ALL_SIMPLE_PRODUCTS[key];
+            if (!prod) {
+                clearMessages();
+                renderMessage('Товар не найден 😕', mainMenuKeyboard());
+                return;
+            }
+            const text = prod.desc;
+            const img = getProductImage(category, key);
+            clearMessages();
+            renderMessage(text, productCardKeyboard(category, key), img);
+            return;
+        }
+
+        // === Добавление в корзину ===
+        if (data.startsWith('add:')) {
+            const key = data.split(':')[1];
+            const prod = getProductByKey(key);
+            if (!prod) return;
+            addToCart(key, prod.name, prod.price);
+            clearMessages();
+            renderMessage(`✅ *${prod.name}* добавлен!\nСумма: ${cartTotal()} ₽`, mainMenuKeyboard());
+            return;
+        }
+
+        // === Корзина ===
+        if (data === 'cart:view') {
+            clearMessages();
+            renderMessage(formatCartText(), cartKeyboard());
+            return;
+        }
+
+        if (data.startsWith('cart:inc:')) {
+            const key = data.split(':')[2];
+            if (cart[key]) {
+                cart[key].qty += 1;
+                updateCartBadge();
+                clearMessages();
+                renderMessage(formatCartText(), cartKeyboard());
+            }
+            return;
+        }
+
+        if (data.startsWith('cart:dec:')) {
+            const key = data.split(':')[2];
+            if (cart[key]) {
+                cart[key].qty -= 1;
+                if (cart[key].qty <= 0) {
+                    delete cart[key];
+                }
+                updateCartBadge();
+                clearMessages();
+                renderMessage(formatCartText(), cartKeyboard());
+            }
+            return;
+        }
+
+        if (data.startsWith('cart:del:')) {
+            const key = data.split(':')[2];
+            removeFromCart(key);
+            clearMessages();
+            renderMessage(formatCartText(), cartKeyboard());
+            return;
+        }
+
+        if (data === 'cart:clear') {
+            clearCart();
+            clearMessages();
+            renderMessage('🧹 Корзина очищена.', cartKeyboard());
+            return;
+        }
+
+        if (data === 'cart:checkout') {
+            if (Object.keys(cart).length === 0) {
+                clearMessages();
+                renderMessage('Корзина пуста!', mainMenuKeyboard());
+                return;
+            }
+            // Начинаем оформление заказа
+            checkoutState = { step: 'name' };
+            clearMessages();
+            renderMessage('✍️ Напишите ваше *имя*:', [
+                [{ label: '⬅️ Отмена', data: 'back:main', type: 'back' }]
+            ]);
+            renderCheckoutInput('name');
+            return;
+        }
+
+        // === Обработка данных из формы ===
+        if (data.startsWith('checkout:')) {
+            const action = data.split(':')[1];
+            if (action === 'name') {
+                const input = document.getElementById('checkoutInput');
+                if (!input) return;
+                const name = input.value.trim();
+                if (name.length < 2) {
+                    renderMessage('Введите имя ещё раз:', [
+                        [{ label: '⬅️ Отмена', data: 'back:main', type: 'back' }]
+                    ]);
+                    renderCheckoutInput('name');
+                    return;
+                }
+                checkoutState = { step: 'phone', name };
+                clearMessages();
+                renderMessage('Укажите *телефон* (например, +7 900 123-45-67):', [
+                    [{ label: '⬅️ Отмена', data: 'back:main', type: 'back' }]
+                ]);
+                renderCheckoutInput('phone');
+                return;
+            }
+
+            if (action === 'phone') {
+                const input = document.getElementById('checkoutInput');
+                if (!input) return;
+                const phone = input.value.trim();
+                const phoneRegex = /^\+?\d[\d\s\-()]{7,}$/;
+                if (!phoneRegex.test(phone)) {
+                    renderMessage('Некорректный номер. Попробуйте ещё раз:', [
+                        [{ label: '⬅️ Отмена', data: 'back:main', type: 'back' }]
+                    ]);
+                    renderCheckoutInput('phone');
+                    return;
+                }
+
+                // Оформляем заказ
+                const name = checkoutState.name;
+                orderCounter++;
+                const orderId = orderCounter;
+                orders[orderId] = {
+                    name,
+                    phone,
+                    items: { ...cart },
+                    total: cartTotal()
+                };
+
+                const total = cartTotal();
+                clearCart();
+                checkoutState = null;
+
+                clearMessages();
+                renderMessage(
+                    `🎉 Заказ №${orderId} оформлен!\n\nИмя: ${name}\nТелефон: ${phone}\nСумма: ${total} ₽\n\n📞 Менеджер свяжется с вами.`,
+                    mainMenuKeyboard()
+                );
+                return;
+            }
+        }
+
+        // fallback
+        console.warn('Неизвестный action:', data);
+    }
+
+    // =========================================================================
+    //  РЕНДЕР ПОЛЯ ВВОДА ДЛЯ ОФОРМЛЕНИЯ
+    // =========================================================================
+
+    function renderCheckoutInput(field) {
+        // Удаляем старый wrapper если есть
+        const oldWrapper = document.getElementById('checkoutWrapper');
+        if (oldWrapper) oldWrapper.remove();
+
+        const wrapper = document.createElement('div');
+        wrapper.id = 'checkoutWrapper';
+        wrapper.style.marginTop = '8px';
+
+        const form = document.createElement('div');
+        form.className = 'checkout-form';
+
+        const input = document.createElement('input');
+        input.id = 'checkoutInput';
+        input.type = field === 'phone' ? 'tel' : 'text';
+        input.placeholder = field === 'name' ? 'Введите имя...' : 'Введите телефон...';
+        input.autofocus = true;
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleButton(`checkout:${field}`, 'primary');
+            }
+        });
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'inline-keyboard';
+        btnRow.innerHTML = `
+            <div class="row">
+                <button class="btn primary" onclick="handleButton('checkout:${field}', 'primary')">✅ Подтвердить</button>
+            </div>
+        `;
+
+        form.appendChild(input);
+        form.appendChild(btnRow);
+        wrapper.appendChild(form);
+        container.appendChild(wrapper);
+
+        // Фокус
+        setTimeout(() => input.focus(), 100);
+
+        // Прокрутка
+        scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
+
+    // =========================================================================
+    //  ПОКАЗ КОРЗИНЫ (из хедера)
+    // =========================================================================
+
+    function viewCart() {
+        if (checkoutState) return;
+        clearMessages();
+        renderMessage(formatCartText(), cartKeyboard());
+    }
+
+    // =========================================================================
+    //  ТЕКСТЫ
+    // =========================================================================
+
+    const WELCOME_TEXT =
+        "👋 Здравствуйте! Я — виртуальный консультант магазина футуристичных термосов " +
+        "*NOMAD X1*.\n\nПомогу подобрать модули, объясню характеристики, предложу апгрейды.";
+
+    const HELP_TEXT =
+        "📞 *Помощь и контакты*\n\n" +
+        "• Для заказа добавьте товары в корзину и оформите заказ.\n" +
+        "• По вопросам пишите: support@nomad-x1.example\n" +
+        "• Телефон: +7 (800) 555-01-02";
+
+    // =========================================================================
+    //  ЗАПУСК
+    // =========================================================================
+
+    // Очищаем и показываем приветствие
+    clearMessages();
+    renderMessage(WELCOME_TEXT, mainMenuKeyboard());
+    updateCartBadge();
+
+    // Обработка resize для корректной прокрутки
+    window.addEventListener('resize', () => {
+        scrollArea.scrollTop = scrollArea.scrollHeight;
+    });
+
+    console.log('🚀 NOMAD X1 Web App запущен!');
+    console.log('📁 Изображения загружаются из папки:', IMAGES_BASE);
+</script>
+
+</body>
+</html>
